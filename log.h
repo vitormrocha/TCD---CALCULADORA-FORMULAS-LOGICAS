@@ -6,6 +6,7 @@ typedef struct Simbolo{
     char caractere; //caractere que sera apresentado pelo usuario
     char conectivo; //conectivo que sera apresentado pelo usuario
     int valor_vdd_1; //valor vdd que o usuario ira atribuir ao caractere. Notacao: 0 = false, 1 = true.
+    int is_neg;
 }simbolo;
 
 typedef struct no{
@@ -17,24 +18,16 @@ typedef struct formula_logica{
     No *inicio;
 }Lista; //serve apenas para a realização da interpretação de formulas logicas
 
-typedef struct Formulas_validas {
 
-    char termo1, termo2, conectivo; //estes serao as variaveis que irao guardar os termos validos.
+typedef struct Dup_no{
+    simbolo info;
+    struct Dup_no *prox; 
+    struct Dup_no *ant; 
+}dup_no; 
 
-}form_val; 
-
-typedef struct Pilha_no{
-
-    form_val info;  
-    struct Pilha_no *prox;
-
-}pilha_no; 
-
-typedef struct Pilha{
-
-    pilha_no *topo;
-
-}pilha; //Sera usado para guardar formulas validas
+typedef struct Lista_Dup{
+    dup_no *first;
+}lista_dup;
 
 
 Lista *criar(); 
@@ -59,6 +52,8 @@ int verificar(Lista *l);
 
 int subformula(Lista *l); 
 
+int tamanho_lista(Lista *l);
+
 /* int interpretar(Lista *l, simbolo termo); 
 */  
 
@@ -66,20 +61,15 @@ void mostrar(Lista *l);
 
 
 
-pilha *criar_pilha ();
-
-int pilha_vazia(pilha *p);
-
-int pop(pilha *p, form_val *valor); //remover e consulta 
-
-void limpar_pilha(pilha *p); 
-
-int push(pilha *p, form_val valor); //inserir
-
-int tamanho_pilha (pilha *p);
 
 
-int interpretar_varios(Lista *l, pilha *p, int quantidade); //retorna um valor verdade que pode ser 0 ou 1, e se o valor for 1, guarda a formula em uma pilha.
+int interpretar_varios(Lista *l, int quantidade); //retorna um valor verdade que pode ser 0 ou 1, e se o valor for 1, guarda a formula em uma pilha.
 
+int concatenar_formulas (Lista *l2, Lista *l3, char conec1, char conec2); 
 
+int copiar_lista1(Lista *l, Lista *l2); //simplesmente copia o conteudo de uma lista para outra
+
+int verificar_invalido(Lista *l); //percorre a lista l1 e verifica se algo esta errado de acordo com as regras da logica proposicional
+
+int verificar_repeticao(Lista *l); 
 
