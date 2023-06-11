@@ -343,7 +343,7 @@ int main () {
                 break;
             }
             
-        case 2:  if (tamanho_lista(l2) > 4) {
+        case 2:  if (tamanho_lista(l2) < 4) {
                     printf("\nERRO. E NECESSARIO QUE PELO MENOS 4 FORMULAS TENHAM SIDO INSERIDAS.\n");
                     break;
             }
