@@ -279,41 +279,6 @@ void menu_notacao() {
 
 
 
-
-/*int buscar_info(lista_dup *l, int mat) {
-
-}*/ 
-
-int limpar_listadup(lista_dup *l) {
-    dup_no *aux;
-    aux= l->first; 
-
-    while (aux != NULL) {
-
-        dup_no *destroy; 
-        destroy = aux; 
-        aux= aux->prox; 
-        free (destroy);
-
-    }
-
-    free(l); 
-    return 1;
-}
-
-void mostrar_dup(lista_dup *l) {
-    printf("\n==========FORMULAS CADASTRADAS ==========\n");
-    if ( l != NULL) {
-        dup_no *aux = l->first;
-        while (aux->prox != NULL) {
-            printf("\n[TERMO : %c, CONECTIVO %c, TERMO 2: %c ]\n", aux->info.caractere, aux->info.conectivo, aux->prox->info.caractere);
-            aux = aux->prox;
-        }
-    }
-    printf("\n=========================================");
-}
-
-
 int interpretar_varios(Lista *l, int quantidade) {
     int i; 
     int valor_verdade = -2; 
