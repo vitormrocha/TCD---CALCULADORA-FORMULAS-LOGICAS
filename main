@@ -216,75 +216,225 @@ int main () {
 
     menu_inicial();
 
-    Lista *l = criar();
-    pilha *p = criar_pilha(); 
+    Lista *l = criar(); //sera usado para realizar a interpretação das formulas.
+    Lista *l2 = criar(); // ira armazenar todas as formulas validas, true ou false.
+    Lista *l3 = criar(); //sera usado para a função de juntar duas formulas.
+    Lista *l4 = criar(); //Sera usado para armazenar as formulas que não são validas de acordo com a lógica proposicional
+
+    Lista *l_true = criar(); //ira guardar as formulas que sao true
+    Lista *l_false = criar(); //ira as formulas que sao false
+
     simbolo c; 
     int quantidade=0;  //quantidade de simbolos apresentados
+
     int opcao;
     int sair;
+    char c1, c2;
     
     do {
-        printf("\nDIGITE 0 PARA SAIR, OU QUALQUER OUTRO NUMERO PARA CONTINUAR.\n");
+        printf("\n0 -  SAIR\n1 - CRIAR FORMULA \n2 - JUNTAR FORMULAS \n3 - VER TODAS AS FORMULAS VALIDAS CADASTRADAS\n4 - VER FORMULAS INVALIDAS\n5 - LIMPAR LISTA DE FORMULAS CADASTRADAS VALIDAS\n>> ");
         scanf("%d", &sair);
 
-        if (sair == 0 ){
-            break;
-        }
-    
-        do {
-            menu_notacao();
-            setbuf(stdin, NULL);
-            scanf("%c", &c.caractere);
+       switch (sair) {
+        case 1: do {
+                c.is_neg = 0;
+                menu_notacao();
+                setbuf(stdin, NULL);
+                scanf("%c", &c.caractere);
+                if (c.caractere == '!') {
+                    c.is_neg = 1;
+                    printf("\nDIGITE O CARACTERE NOVAMENTE. ");
+                    setbuf(stdin, NULL);
+                    scanf("%c", &c.caractere);
+                }
 
-            printf("\nAPRESENTE O VALOR VERDADE DESSE TERMO. NOTACAO: 0 = FALSE, 1 = TRUE\n>> ");
-            setbuf(stdin, NULL); 
-            scanf("%d", &c.valor_vdd_1);
+                printf("\nAPRESENTE O VALOR VERDADE DESSE TERMO. NOTACAO: 0 = FALSE, 1 = TRUE\n>> ");
+                setbuf(stdin, NULL); 
+                scanf("%d", &c.valor_vdd_1);
 
-            quantidade++;
+                if (c.is_neg == 1 && c.valor_vdd_1 == 1) {
+                    c.valor_vdd_1 = 0;
+                    c.is_neg = 0;
+                }
+                if (c.is_neg == 1 && c.valor_vdd_1 == 0) {
+                    c.valor_vdd_1 = 1;
+                    c.is_neg = 0;
+                }
 
-            if (c.valor_vdd_1 == -1) {
+
+                quantidade++;
+
+                if (c.valor_vdd_1 == -1) {
+                    inserirfim(l, c);
+                    break;
+                }
+        
+
+                printf("\nAPRESENTE UM CONECTIVO. \nNOTACAO: \n'=' == SE\n'-' == SE, E SOMENTE SE\n'*' == AND\n'!' == NOT \n'+' == OR\n>> "); 
+                setbuf(stdin, NULL); 
+                scanf("%c", &c.conectivo);
+
                 inserirfim(l, c);
+                printf("\nDIGITE 0 SE NAO DESEJAR PROSSEGUIR\n>> ");
+                scanf("%d", &opcao);
+
+            }while (opcao != 0);
+
+            int verf;
+            verf = verificar_invalido(l); 
+            if (verf == 1) {
+                printf("\nERRO. CARACTERE INVALIDO. TENTE NOVAMENTE.\n");
+                copiar_lista1(l, l4);
+                limpar(l);
                 break;
             }
+            if (verf == 2) {
+                printf("\nERRO. CONECTIVO INVALIDO. TENTE NOVAMENTE. PRESTE ATENCAO NA NOTACAO UTILIZADA.\n");
+                copiar_lista1(l, l4);
+                limpar(l);
+                break;
+            }
+            if (verf == 3) {
+                printf("\nERRO. VALOR VERDADE INVALIDO. TENTE NOVAMENTE.\n");
+                copiar_lista1(l, l4);
+                limpar(l);
+                break;
+            }
+
+            int valor = -1;
+
+            if (quantidade == 1) {
+
+                if (c.valor_vdd_1 == 1) {
+                    printf("\nFORMULA: TRUE.\n");
+                    copiar_lista1(l, l2);
+                    copiar_lista1(l, l_true);
+                    limpar(l);
+                    break;
+                }
+                 if (c.valor_vdd_1 == 0) {
+                    printf("\nFORMULA: FALSE.\n");
+                    copiar_lista1(l, l2);
+                    copiar_lista1(l, l_false);
+                    limpar(l);
+                    break;
+                }
+
+            }
+
+            valor = interpretar_varios(l, quantidade);
+            if (valor == 0) {
+
+                printf("\nFORMULA: FALSE.\n"); 
+                copiar_lista1(l, l2);
+                copiar_lista1(l, l_false);
+                limpar(l); 
+                quantidade = 0;
+                break;
+
+            }
+            if (valor == 1) {
+
+                printf("\nFORMULA: TRUE.\n"); 
+                copiar_lista1(l, l2);
+                copiar_lista1(l, l_true);
+                limpar(l);
+                quantidade = 0;
+                break;
+            }
+            
+        case 2:  if (tamanho_lista(l2) > 4) {
+                    printf("\nERRO. E NECESSARIO QUE PELO MENOS 4 FORMULAS TENHAM SIDO INSERIDAS.\n");
+                    break;
+            }
+                if (verificar_repeticao(l2) == 1) {
+                    printf("\nERRO. EXISTEM REPETICOES. TENTE LIMPAR A LISTA ANTES DE PROSSEGUIR.\n");
+                    break;
+                } 
+                printf("\nQUAIS SAO OS CARACTERES QUE VOCE DESEJA BUSCAR? \n>> ");
+                setbuf(stdin, NULL);
+                scanf("%c", &c1);
+                printf("\n>> ");
+                setbuf(stdin, NULL); 
+                scanf("%c", &c2); 
+
+
+            int temp;
+            temp = concatenar_formulas(l2, l3, c1, c2);
+
+
+            if (temp != -3 && temp != 0) {
+
+                printf("\nQUAIS SAO OS OUTROS DOIS CARACTERES QUE VOCE DESEJA BUSCAR? \n>> ");
+                setbuf(stdin, NULL);
+                scanf("%c", &c1);
+                printf("\n>> ");
+                setbuf(stdin, NULL); 
+                scanf("%c", &c2); 
+
+                temp = concatenar_formulas(l2, l3, c1, c2);
+
+                if (temp != -3 || temp != 0) {
+
+                    int aux = tamanho_lista(l3);
+                    int valor;
+                    valor = interpretar_varios(l3, aux);
+                    if (valor == 0) {
+
+
+                        printf("\nFORMULA: FALSE.\n"); break; 
+                        quantidade = 0;
+
+                    }
+
+                    if (valor == 1) {
+
+                        printf("\nFORMULA: TRUE.\n"); 
+                        limpar(l);
+                        quantidade = 0;
+                        break;
+                    }
+
+
+                }
+                if (temp == 3) {
+                    printf("\nERRO. CARACTERES NAO FORAM ENCONTRADOS.\nTENTE NOVAMENTE, E NOTE QUE OS DOIS CARACTERES DEVEM ESTAR CONSECUTIVOS.\n");
+                }
+                if (temp == 0) {
+                    printf("\nERRO. NAO HA NENHUMA FORMULA CADASTRADA.\nTENTE NOVAMENTE. DESSA VEZ, TENTE CRIAR FORMULAS ANTES DE TENTAR JUNTAR-LAS.\n");
+                }
+            }
+          
+
+        case 3: do {
+                    printf("\n1 - VER TODAS AS FORMULAS \t2- VER TODAS AS FORMULAS TRUE\t3 - VER TODAS AS FORMULAS FALSE.\n>> ");
+                    setbuf(stdin, NULL);
+                    scanf("%d", &opcao);
+                    switch (opcao) {
+                        case 1: mostrar(l2); break;
+                        case 2: mostrar(l_true); break; 
+                        case 3: mostrar(l_false); break;
+                        default : printf("\nNUMERO INVALIDO.\n"); break;
+
+                    } 
+                }while (opcao < 0 || opcao > 3); break; 
+
+        case 4: mostrar_invalido(l4); break;
+
+        case 5: limpar(l2);
+
+        case 0: sair = 0; break;
+
+        default: printf("\nNUMERO INVALIDO. TENTE NOVAMENTE.\n"); break;
+            
+
+       }
     
-
-            printf("\nAPRESENTE UM CONECTIVO. \nNOTACAO: \n'=' == SE\n'-' == SE, E SOMENTE SE\n'*' == AND\n'!' == NOT \n'+' == OR\n>> "); 
-            setbuf(stdin, NULL); 
-            scanf("%c", &c.conectivo);
-
-            inserirfim(l, c);
-            printf("\nDIGITE 0 SE NAO DESEJAR PROSSEGUIR\n>> ");
-            scanf("%d", &opcao);
-
-        }while (opcao != -0);
-
-        int verf;
-        verf = verificar(l); 
-        
-        if (( verificar(l) == 0 ) || ( verificar(l) <= 12 ) || ( verificar(l) == 13 ) || (verificar(l) >= 30) ) {
-            printf("\nERRO. TERMOS APRESENTADOS SAO INVALIDOS. TENTE NOVAMENTE\n"); 
-        }
-
-        mostrar(l); 
-        int valor = -1;
-        printf("\nTESTE: QUANTIDADE == %d", quantidade); 
-
-        valor = interpretar_varios(l, p, quantidade);
-        if (valor == 0) {
-
-            printf("\nFORMULA: FALSE.");
-
-        }
-        if (valor == 1) {
-
-            printf("\nFORMULA: TRUE."); 
-            mostrar_pilha(p); 
-            limpar(l); 
-        }
 
     }while (sair != 0);
 
     printf("\nCONCLUIDO.\n"); 
+    system("pause"); 
 
     return 0; 
     
