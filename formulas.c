@@ -319,14 +319,13 @@ int interpretar_varios(Lista *l, int quantidade) {
     int valor_verdade = -2; 
     No *aux = l->inicio; 
 
-    for (i=0; i < quantidade, aux->prox != NULL; i++, aux = aux->prox) {
+    for (i=0; i < quantidade, aux != NULL; i++, aux = aux->prox) {
 
         No *aux2 = aux->prox;
-
-
-        //printf("\nTESTE INFORMACAO: %c, %d, %c", informacao.caractere, informacao.valor_vdd_1, informacao.conectivo);
-        //printf("\nTESTE SIMB2: %c, %d, %c", simb2.caractere, simb2.valor_vdd_1, simb2.conectivo);
-
+        
+        if (aux2 == NULL) {
+            break;
+        }
 
             if (aux->sim.conectivo == '=' ) {
                 
