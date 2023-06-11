@@ -143,11 +143,26 @@ int verificar(Lista *l){
 
         n = n->prox;
     }
+    return 0;
 }
 
 /*int subformula(Lista *l){
 
 }*/
+
+int tamanho_lista(Lista *l) {
+    if (l == NULL || l->inicio == NULL) {
+        return -2;
+    }
+    int temp = 0;
+    No *aux = l->inicio;
+    while (aux != NULL) {
+        temp++;
+        aux = aux->prox;
+    }
+    return temp;
+
+}
 
 /*int interpretar(Lista *l, simbolo termo ) { //interpreta apenas 2 termos
 
@@ -240,13 +255,16 @@ int verificar(Lista *l){
 
 
 void mostrar(Lista *l) {
-    if (l != NULL) {
-        No *aux = l->inicio; 
+    printf("\n========== FORMULAS CADASTRADAS VALIDAS ==========\n");
+    if (l->inicio != NULL) {
+        No *aux = l->inicio;
         while (aux != NULL) {
-            printf("[CARACTERE [%c]  CONECTIVO [%c] VALOR VDD [%d] \n]", aux->sim.caractere, aux->sim.conectivo, aux->sim.valor_vdd_1);
+            printf("\n[CARACTERE [%c]  CONECTIVO [%c] VALOR VDD [%d] ]\n", aux->sim.caractere, aux->sim.conectivo, aux->sim.valor_vdd_1);
             aux = aux->prox;
         }
+
     }
+    printf("\n===================================================\n");
 }
 
 void menu_inicial() {
@@ -255,136 +273,48 @@ void menu_inicial() {
 }
 
 void menu_notacao() {
-    printf("\n\nNOTACAO: 0 = FALSE \t1 = TRUE.\n");
+    printf("\n\nNOTACAO: 0 = FALSE \t1 = TRUE. \tDIGITE '!' SE DESEJAR ADICIONAR UMA NEGACAO\n");
     printf("\nAPRESENTE UM TERMO\n ");
 }
 
-pilha *criar_pilha () {
 
-    pilha *p = (pilha *) malloc(sizeof(pilha)); 
-    if (p == NULL) {
-        return NULL; 
+
+
+/*int buscar_info(lista_dup *l, int mat) {
+
+}*/ 
+
+int limpar_listadup(lista_dup *l) {
+    dup_no *aux;
+    aux= l->first; 
+
+    while (aux != NULL) {
+
+        dup_no *destroy; 
+        destroy = aux; 
+        aux= aux->prox; 
+        free (destroy);
+
     }
-    p->topo = NULL;
-    return p;
 
+    free(l); 
+    return 1;
 }
 
-int pilha_vazia(pilha *p) {
-    if (p == NULL) {
-        return -1;
-    }
-    if (p->topo == NULL) {
-        return -3;
-    }
-    else {
-        return -2; 
-    }
-}
-
-int pop (pilha *p, form_val *valor) {
-
-    if ( p == NULL) {
-        return -1;
-    }
-    if ( pilha_vazia(p) == -3 ) {
-        return -3;
-    }
-
-    if (valor != NULL) {
-    
-        pilha_no *aux; 
-        aux = p->topo;
-
-        *valor= aux->info; 
-        p->topo = aux->prox;
-
-        free(aux); 
-        return 1;
-    }
-    if (valor == NULL) {
-        
-        pilha_no *aux = p->topo; 
-        p->topo = aux->prox;
-        free(aux); 
-
-        return 1;
-    }
-
-}
-
-void limpar_pilha(pilha *p) {
-
-    if (p == NULL) {
-        return ; 
-    }
-    while (pilha_vazia(p) != -3) {
-        pop(p, NULL ); 
-    }
-
-    free(p);
-    p = NULL;
-
-}
-
-int push(pilha *p, form_val valor) {
-    if (p == NULL) {
-        return -1;
-    }
-
-    pilha_no *aux = (pilha_no *) malloc(sizeof(pilha_no));
-    aux->info = valor; 
-
-    aux->prox = p->topo; 
-    p->topo = aux; 
-
-    return 1; 
-}
-
-int consultar_pilha (pilha *p, form_val *valor) {
-    
-    if (p == NULL) {
-        return -1;
-    }
-    if (pilha_vazia(p) == -3) {
-        return -3;
-    }
-    pilha_no *aux; 
-    
-    *valor = aux->info;
-
-    return 1; 
-}
-
-int tamanho_pilha (pilha *p) {
-    if ( p == NULL ) {
-        return -1;
-    }
-    
-    int contador = 0; 
-    pilha_no *temp = p->topo; 
-
-    while (temp != NULL) {
-        contador++;
-        temp = temp->prox; 
-    }
-    return contador;
-}
-
-void mostrar_pilha (pilha *p) {
-    if ( p != NULL ) {
-        printf("\n======PILHA======\n{ \n");
-        pilha_no *aux = p->topo;
-        while ( aux != NULL ) {
-            printf("[ TERMO 1: %c, CONECTIVO %c, TERMO 2: %c ]\n", aux->info.termo1, aux->info.conectivo,aux->info.termo2);
+void mostrar_dup(lista_dup *l) {
+    printf("\n==========FORMULAS CADASTRADAS ==========\n");
+    if ( l != NULL) {
+        dup_no *aux = l->first;
+        while (aux->prox != NULL) {
+            printf("\n[TERMO : %c, CONECTIVO %c, TERMO 2: %c ]\n", aux->info.caractere, aux->info.conectivo, aux->prox->info.caractere);
             aux = aux->prox;
-        } 
-        printf(" }"); 
+        }
     }
+    printf("\n=========================================");
 }
 
 
-int interpretar_varios(Lista *l, pilha *p, int quantidade) {
+int interpretar_varios(Lista *l, int quantidade) {
     int i; 
     int valor_verdade = -2; 
     No *aux = l->inicio; 
@@ -392,15 +322,11 @@ int interpretar_varios(Lista *l, pilha *p, int quantidade) {
     for (i=0; i < quantidade, aux->prox != NULL; i++, aux = aux->prox) {
 
         No *aux2 = aux->prox;
-        printf("\nTESTE AUX: %c, %d", aux->sim.caractere, aux->sim.valor_vdd_1);
-        printf("\nTESTE AUX2: %c, %d", aux2->sim.caractere, aux2->sim.valor_vdd_1);
 
-        form_val informacao; 
-        informacao.termo1 = aux->sim.conectivo;
-        informacao.termo2 = aux2->sim.caractere;
-        informacao.conectivo = aux->sim.conectivo;
 
-        
+        //printf("\nTESTE INFORMACAO: %c, %d, %c", informacao.caractere, informacao.valor_vdd_1, informacao.conectivo);
+        //printf("\nTESTE SIMB2: %c, %d, %c", simb2.caractere, simb2.valor_vdd_1, simb2.conectivo);
+
 
             if (aux->sim.conectivo == '=' ) {
                 
@@ -408,16 +334,15 @@ int interpretar_varios(Lista *l, pilha *p, int quantidade) {
                     valor_verdade = 0;
                 }
                 else {
+                    
                     valor_verdade = 1;
                 }
 
             }
 
-            if (aux->sim.conectivo == '-') {
+            if (aux->sim.conectivo == '-') { 
 
                 if ( (aux->sim.valor_vdd_1 == 1 && aux2->sim.valor_vdd_1 == 1) || (aux->sim.valor_vdd_1 == 0 && aux2->sim.valor_vdd_1 == 0) ) {
-
-                    push(p, informacao);
 
                     valor_verdade = 1;
                 }
@@ -430,18 +355,22 @@ int interpretar_varios(Lista *l, pilha *p, int quantidade) {
 
                 if (aux->sim.valor_vdd_1 == 1 && aux2->sim.valor_vdd_1 == 1) {
 
-                    push(p, informacao);
-
                     valor_verdade = 1;
                 }
                 else if (aux->sim.valor_vdd_1 == 1 && aux2->sim.valor_vdd_1 == 0) {
+
                     valor_verdade = 0;
                 }
+
                 else if (aux->sim.valor_vdd_1 == 0 && aux2->sim. valor_vdd_1 == 1) {
+
                     valor_verdade = 0;
+
                 }
                 else if (aux->sim.valor_vdd_1 == 0 && aux2->sim.valor_vdd_1 == 0) {
+
                     valor_verdade = 0;
+                    
                 }
              }
 
@@ -469,20 +398,15 @@ int interpretar_varios(Lista *l, pilha *p, int quantidade) {
                     valor_verdade = 0;
                 }
                 else if (aux->sim.valor_vdd_1 == 1 && aux2->sim.valor_vdd_1 == 1) {
-
-                    push(p, informacao);
-
                     valor_verdade = 1;
                 }
                 else if (aux->sim.valor_vdd_1 == 1 && aux2->sim.valor_vdd_1 == 0) {
-
-                    push(p, informacao);
 
                     valor_verdade = 1;
                 }
                 else if (aux->sim.valor_vdd_1 == 0 && aux2->sim.valor_vdd_1 == 1) {
 
-                    push(p, informacao);
+                    
 
                     valor_verdade = 1;
                 }
@@ -494,3 +418,109 @@ int interpretar_varios(Lista *l, pilha *p, int quantidade) {
     }
     return valor_verdade;
 }
+
+int concatenar_formulas (Lista *l2, Lista *l3, char conec1, char conec2) {
+    
+    if (listaVazia(l2) == 0 ) {
+        return 0;
+    }
+    No *aux = l2->inicio;
+    int temp = tamanho_lista(l3);
+    printf("\nTESTE TEMP = %d", temp);
+
+    while (aux->prox != NULL) {
+        if (aux->sim.caractere == conec1) {
+            printf("\nTESTE: ACHOU O PRIMEIRO.\n");
+            inserirfim(l3, aux->sim);
+            
+            if (aux->prox->sim.caractere == conec2) {
+                printf("\nTESTE: ACHOU O SEGUNDO.\n");
+                inserirfim(l3, aux->prox->sim);
+            }
+        }
+        aux = aux->prox;
+    }
+    int aux2 = tamanho_lista(l3);
+    printf("\nTESTE AUX: %d\n", aux2);
+
+    if (temp == aux2) {
+        return -3; 
+    } 
+    else {
+        return 1; 
+    }
+
+}
+
+int copiar_lista1(Lista *l, Lista *l2) {
+    if (l == NULL || l->inicio == NULL) {
+        return -2;
+    } 
+
+    No *aux = l->inicio;
+    while (aux != NULL) {
+        inserirfim(l2, aux->sim);
+        aux = aux->prox;
+    }
+    return 1;
+
+}
+
+//retorna um valor se a lista possuir algum valor errado
+int verificar_invalido(Lista *l) {
+    if (l == NULL || l->inicio == NULL) {
+        return -3;
+    } 
+    No *aux = l->inicio;
+    while (aux->prox != NULL) {
+        if (aux->sim.caractere == '=' || aux->sim.caractere == '+' || aux->sim.caractere == '*' || aux->sim.caractere == '!' ||aux->sim.caractere == '-' ) {
+            return 1;
+        }
+        if ( (aux->sim.conectivo >= 90 && aux->sim.conectivo <= 65) || (aux->sim.conectivo <= 97 && aux->sim.conectivo >= 122) ) {
+            return 2;
+        }
+        if (aux->sim.valor_vdd_1 > 1 || aux->sim.valor_vdd_1 < 0) {
+            return 3; 
+        }
+        aux = aux->prox;
+    }
+    return 0;
+}
+
+void mostrar_invalido(Lista *l) {
+    printf("\n========== FORMULAS CADASTRADAS INVALIDAS. ==========\n");
+    if (l->inicio != NULL) {
+        No *aux = l->inicio;
+        while (aux != NULL) {
+            printf("\n[TERMO: [%c], CONECTIVO [%c], VALOR VERDADE: [%d] ]\n", aux->sim.caractere, aux->sim.conectivo, aux->sim.valor_vdd_1);
+            aux = aux->prox;
+        }
+    }
+    printf("\n=====================================================\n");
+}
+
+int verificar_repeticao(Lista *l) {
+    if (l->inicio == NULL) {
+        return -2;
+    }
+    No *aux = l->inicio;
+
+    while (aux != NULL) {
+        No *temp = aux;
+
+        while (temp->prox != NULL) {
+            if (aux->sim.caractere == temp->prox->sim.caractere) {
+                return 1;
+            }
+            temp = temp->prox;
+        }
+        aux = aux->prox;
+    }
+
+    return 0;
+
+}
+    
+
+
+
